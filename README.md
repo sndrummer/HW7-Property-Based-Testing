@@ -1,45 +1,22 @@
-# HW7 Property Based Testing
-## Parameterized Tests
-1. First you declare that it is a parameterized test
-2. Use methodSource and give it THE NAME of the method that will 
-generate the arguments that you would like to test.
+# HW-7 Report
 
+##1. Binary Search 
+   testPostCondition(int[], int) revealed some problems with the binary search method 
+   1. Input `[[-9, -6, -4, -2, 0, 0, 3, 5, 6, 8], 5]` failed.
+   2. On observation it looks like the following need to be swapped since it is moving the search in the wrong direction.
+        ```
+        if (array[index] < value) {
+            right = index - 1;
+        } else
+              left = index + 1;
+        ```  
+        This was changed to 
+         ```
+         if (array[index] < value) {
+            left = index + 1;
+         } else
+            right = index - 1;
+         ```
 
+##2. Merge Sort   
 
-
-
-1. Property based testing 
-    - Generate a random input that satisfies the precondition
-    - Feed it to the function
-    - Check that a property on the output holds (postcondition)
-
-2. Runtime Exceptions 
-3. Algebraic Properties
-    - Inverse: Test failing input basically, if x 
-4. Equivalence of stateful objects 
-    - generate random programs 
-    - check that they give the same output 
-    
-#Equivalence of stateful objects example
-
-```java
-int[] test1(Set<int> b){
- b.add(2);
- b.add(3);
- b.add(1);
- b.add(5);
- b.add(5);
- b.remove(6);
- b.add(10);
- b.add(3);
- return b.allElements();
-}
-
-int [] res1 = test1(new SlowAndSimpleSet());
-int [] res2 = test1(new SuperSmartSet());
-
-return checkSame(res1,res2);
-```
-
-
- 
