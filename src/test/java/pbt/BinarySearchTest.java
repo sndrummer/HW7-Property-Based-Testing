@@ -2,6 +2,7 @@ package pbt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -10,6 +11,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -22,12 +24,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Uses parametric tests to test the different properties of the Binary Search method
+ */
 public class BinarySearchTest {
     private static Logger logger = LoggerFactory.getLogger(BinarySearchTest.class);
 
-    public static Random rand = new Random();
+    private static Random rand = new Random();
 
-    private static final int MAX_ARRAY_SIZE = 25;
+    private static final int MAX_ARRAY_SIZE = 15;
     private static final int MIN_ARRAY_VAL = -10;
     private static final int MAX_ARRAY_VAL = 10;
 
@@ -64,9 +69,7 @@ public class BinarySearchTest {
                 right = index - 1;
         }
         return false;
-
     }
-
 
     /**
      * Generates a random sorted array with values between MIN_ARRAY_VAL and MAX_ARRAY_VAL
@@ -78,10 +81,15 @@ public class BinarySearchTest {
         int arraySize = getRandomInt(0, MAX_ARRAY_SIZE);
         int[] arr = new int[arraySize];
 
+        List<Integer> arrayValues = new ArrayList<>();
 
         for (int i = 0; i < arraySize; i++) {
             int arrayVal = getRandomInt(MIN_ARRAY_VAL, MAX_ARRAY_VAL);
-            arr[i] = arrayVal;
+            if (!arrayValues.contains(arrayVal)) {
+                arr[i] = arrayVal;
+                arrayValues.add(arrayVal);
+            } else --i;
+
         }
 
         Arrays.sort(arr);
@@ -163,7 +171,7 @@ public class BinarySearchTest {
      */
     @ParameterizedTest(name = "run #{index} with [{arguments}]")
     @MethodSource("generateArrayArgs")
-    void testEquivalence(int[] array, int value) {
+    void testPointWiseEquivalence(int[] array, int value) {
         //Assert equivalence with slowSearch
         assertEquals(slowSearch(array, value), search(array, value));
     }
@@ -185,18 +193,48 @@ public class BinarySearchTest {
 
 
     /**
-     * Test algebraic properties
+     * Tests the inverse property, so if an array contains that value then removing it and running
+     * the test again should be the opposite of the the original result, while if an array does
+     * not contain a value then adding the value should produce the opposite result.
+     *
      * @param array a random int array that is generated at runtime to be tested with search
      * @param value an int value that is generated at runtime to be tested with search
      */
     @ParameterizedTest(name = "run #{index} with [{arguments}]")
     @MethodSource("generateArrayArgs")
-    void testAlgebraicProperties(int[] array, int value) {
+    void testInverseProperty(int[] array, int value) {
+        boolean found = search(array, value);
 
+        boolean actual;
+        boolean oppositeOfActual;
 
+        actual = search(array, value);
+
+        if (found) {
+            //delete value
+            int[] newArr = new int[array.length - 1];
+            for (int i = 0; i < newArr.length; i++) {
+                if (array[i] == value) {
+                    newArr[i] = array[i + 1];
+                }
+                else newArr[i] = array[i];
+            }
+            logger.debug("Deleted {}.. Array: {} vs newArray: {}", value, array, newArr);
+            oppositeOfActual = search(newArr, value);
+        } else {
+            //add value
+            int[] newArr = Arrays.copyOf(array, array.length + 1);
+            newArr[array.length] = value;
+            Arrays.sort(newArr);
+            logger.debug("Added {}.. Array: {} vs newArray: {}", value, array, newArr);
+            oppositeOfActual = search(newArr, value);
+        }
+
+        assertNotEquals(oppositeOfActual, actual);
     }
 
 
+    //TODO delete example
 
     public static void streamExample() {
         // create a list of integers
