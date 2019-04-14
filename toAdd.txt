@@ -1,3 +1,5 @@
 In this homework you will have to add the pom changes because it doesn't work without them.
 
 1. pom.xml
+2. DELETE TEST CLASS!!
+3. ADD ALL THE TEST FILES OBVIOUSLY

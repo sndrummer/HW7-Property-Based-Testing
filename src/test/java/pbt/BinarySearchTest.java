@@ -167,7 +167,7 @@ public class BinarySearchTest {
 
 
     /**
-     * Test runtime exceptions
+     * Test pointwise equivalent by comparing the binary search with a simple O(n) search
      */
     @ParameterizedTest(name = "run #{index} with [{arguments}]")
     @MethodSource("generateArrayArgs")

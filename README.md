@@ -19,4 +19,23 @@
          ```
 
 ##2. Merge Sort   
-
+   testPostCondition(int[] array) quickly revealed that there were some problems with the mergeSort
+   - Original array: 
+   ```
+   [0, -1, -2, -3, -8, 8, -3, -10, 9, -1, -6, -9, 8, 10]
+   ```
+  vs Sorted array: 
+  ```
+  [-10, -9, -3, -1, -1, 0, 8, 10]
+  ```
+ - I noticed the following two lines 
+  ```java
+    int[] left = sort(array, from, m - 1);
+    int[] right = sort(array, m + 1, to);
+```
+   The m index was not being covered which could cause the deletion of values so I just changed it to 
+   ```java
+    int[] left = sort(array, from, m);
+    int[] right = sort(array, m + 1, to);
+```
+   and it appears to be working now.
