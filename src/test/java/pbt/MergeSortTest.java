@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -32,10 +31,35 @@ public class MergeSortTest {
     private static final int AMT_TESTS = 10;
 
 
-    private static int getRandomInt(int min, int max) {
+    /**
+     * Returns a random integer given a min int and max int
+     *
+     * @param min int
+     * @param max int
+     * @return random int
+     */
+    public static int getRandomInt(int min, int max) {
         return rand.nextInt((max - min) + 1) + min;
-
     }
+
+    /**
+     * Generates a random array with values between MIN_ARRAY_VAL and MAX_ARRAY_VAL
+     * and a random size from 0 to MAX_ARRAY_SIZE
+     *
+     * @return random array of ints with
+     */
+    public static int[] generateRandomArray(int minArraySize, int maxArraySize, int minArrayVal,
+                                            int maxArrayVal) {
+        int arraySize = getRandomInt(minArraySize, maxArraySize);
+        int[] arr = new int[arraySize];
+
+        for (int i = 0; i < arraySize; i++) {
+            arr[i] = getRandomInt(minArrayVal, maxArrayVal);
+        }
+
+        return arr;
+    }
+
 
     /**
      * cs329.requires: array is non-null
@@ -94,22 +118,18 @@ public class MergeSortTest {
     }
 
 
-    /**
-     * Generates a random array with values between MIN_ARRAY_VAL and MAX_ARRAY_VAL
-     * and a random size from 0 to MAX_ARRAY_SIZE
-     *
-     * @return random array of ints with
-     */
-    private static int[] generateRandomArray() {
-        int arraySize = getRandomInt(1, MAX_ARRAY_SIZE);
-        int[] arr = new int[arraySize];
+//    private static int[] generateRandomArray(int minArraySize, int maxArraySize, int minArrayVal,
+//                                             int maxArrayVal) {
+//        int arraySize = getRandomInt(1, MAX_ARRAY_SIZE);
+//        int[] arr = new int[arraySize];
+//
+//        for (int i = 0; i < arraySize; i++) {
+//            arr[i] = getRandomInt(MIN_ARRAY_VAL, MAX_ARRAY_VAL);
+//        }
+//
+//        return arr;
+//    }
 
-        for (int i = 0; i < arraySize; i++) {
-            arr[i] = getRandomInt(MIN_ARRAY_VAL, MAX_ARRAY_VAL);
-        }
-
-        return arr;
-    }
 
     /**
      * Generates the random arguments to be tested for the binary search tests
@@ -120,7 +140,8 @@ public class MergeSortTest {
         ArrayList<Arguments> args = new ArrayList<>();
 
         for (int i = 0; i < AMT_TESTS; i++) {
-            args.add(Arguments.of(generateRandomArray()));
+            args.add(Arguments.of(generateRandomArray(1, MAX_ARRAY_SIZE,
+                    MIN_ARRAY_VAL, MAX_ARRAY_VAL)));
         }
 
         return args.stream();
