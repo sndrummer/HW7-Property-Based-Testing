@@ -87,16 +87,12 @@ public class LLHashTableTest {
      */
     @ParameterizedTest(name = "run #{index} with [{arguments}]")
     @MethodSource("generateArrayArgs")
-    void testStatefulEquivalencePut(int[] prefixKeys, int[] prefixValues, int[] suffix) {
+    void testStatefulEquivalencePutOrder(int[] prefixKeys, int[] prefixValues, int[] suffix) {
 
         assertEquals(prefixKeys.length, prefixValues.length);
 
-        logger.debug("KEYS: {}", prefixKeys);
-        logger.debug("VALS: {}", prefixValues);
-
         //prefix
         applyPrefix(prefixKeys, prefixValues);
-
 
         //key value pairs
         int keyA = 55555;
@@ -121,6 +117,52 @@ public class LLHashTableTest {
         //Assert that the hashtables are equivalent
         assertEquals(hashTable1.toString(), hashTable2.toString());
     }
+
+
+    /**
+     * Test Stateful equivalence when changing the order of the key value pairs that are 'put'
+     * in the hashTable. put(Ka,Va), put(Kb,Vb) <==> put(Kb,Vb), put(Ka, Va) iff Ka != Kb
+     *
+     * @param prefixKeys   array of randomly generated ints
+     * @param prefixValues array of randomly generated ints
+     */
+    @ParameterizedTest(name = "run #{index} with [{arguments}]")
+    @MethodSource("generateArrayArgs")
+    void testStatefulEquivalencePutThenRemoveOrder(int[] prefixKeys, int[] prefixValues, int[] suffix) {
+
+        assertEquals(prefixKeys.length, prefixValues.length);
+
+        //prefix
+        applyPrefix(prefixKeys, prefixValues);
+
+        //key value pairs
+        int keyA = 55555;
+        int valA = 11111;
+
+        //Test put with different orders
+        int randomIndexToRemove = getRandomInt(0, prefixKeys.length - 1);
+
+        //Test put with different orders
+        int keyToRemove = prefixKeys[randomIndexToRemove];
+
+        hashTable1.remove(keyToRemove);
+        hashTable1.put(keyA, valA);
+
+
+        hashTable2.put(keyA, valA);
+        hashTable2.remove(keyToRemove);
+
+        //suffix
+        applySuffix(prefixKeys, prefixValues, suffix);
+
+        //Assert objects are the same
+        assertEquals(hashTable1, hashTable2);
+
+        //Assert that the hashtables are equivalent
+        assertEquals(hashTable1.toString(), hashTable2.toString());
+    }
+
+
 
     private void applyPrefix(int[] prefixKeys, int[] prefixValues) {
         for (int i = 0; i < prefixKeys.length; i++) {
@@ -150,20 +192,17 @@ public class LLHashTableTest {
         //List<Integer> prefixKeys = new ArrayList<Integer>();
         //List<Integer> prefixValues = new ArrayList<Integer>();
 
-        int randomSize = getRandomInt(1, HASH_BUCKET_MAX);
-
-        int[] prefixKeys = new int[HASH_BUCKET_MAX];
-        int[] prefixValues = new int[HASH_BUCKET_MAX];
-
-        int[] suffix = new int[HASH_BUCKET_MAX];
-
-
         for (int i = 0; i < AMT_TESTS; i++) {
-            for (int j = 0; j < HASH_BUCKET_MAX; j++) {
-                prefixKeys[i] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
-                prefixValues[i] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
+            int randomSize = getRandomInt(1, HASH_BUCKET_MAX);
+            int[] prefixKeys = new int[randomSize];
+            int[] prefixValues = new int[randomSize];
 
-                suffix[i] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
+            int[] suffix = new int[randomSize];
+            for (int j = 0; j < randomSize; j++) {
+                prefixKeys[j] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
+                prefixValues[j] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
+
+                suffix[j] = getRandomInt(MIN_TEST_VAL, MAX_TEST_VAL);
 
             }
             args.add(Arguments.of(prefixKeys, prefixValues, suffix));

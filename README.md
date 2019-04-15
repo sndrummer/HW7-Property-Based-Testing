@@ -39,3 +39,35 @@
     int[] right = sort(array, m + 1, to);
 ```
    and it appears to be working now.
+   
+##3. Stateful Testing
+- While testing the hashTable I came across an error that was showing up some of the time in the tests
+such as the following `testStatefulEquivalencePutThenRemoveOrder()` where a key was removed and then another key value pair was added on the first hash table
+and then the same thing but in opposite order on the second hash table. What I found was the following discrepency while testing. 
+The Assertion of equality failed with this difference: 
+```
+Expected :{ nrBuckets: 25, buffer: [null, null, null, null, (4, -2) :: null, (55555, 11111) :: (-5, -6) :: null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}
+Actual   :{ nrBuckets: 25, buffer: [null, null, null, null, (4, -2) :: null, (55555, 11111) :: null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}
+``` 
+I noticed that when removing a key that is equal to the hash value, it was not deleted properly.
+I realized that the following code: 
+```
+        while (el != null) {
+            if (el.next != null && el.next.key == key) {
+                el.next = el.next.next;
+           }
+            el = el.next;
+        }
+```
+should be changed to 
+```
+         while (el != null) {
+            while (el.next != null && el.next.key == key) {
+                el.next = el.next.next;
+            }
+            el = el.next;
+        }
+```
+This change seemed to resolve the problem because now it will continue to remove all the key/value pairs
+with the given key. Which I believe is how it should function. 
+

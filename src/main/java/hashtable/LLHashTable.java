@@ -92,13 +92,13 @@ public class LLHashTable {
         int index = hashOf(key);
         HashEntry el = this.buffer[index];
         while (el != null) {
-            if (el.next != null && el.next.key == key) {
+            while (el.next != null && el.next.key == key) {
                 el.next = el.next.next;
-
             }
             el = el.next;
         }
     }
+
 
     public String toString() {
         return "{ nrBuckets: " + this.nrBuckets + ", buffer: "
